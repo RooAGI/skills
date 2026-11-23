@@ -1,0 +1,83 @@
+{
+  "$comment": "Upstream skills RooAGI ships. Each source is pinned to a commit; scripts/sync.mjs copies the listed skills (a `folder/*` entry takes every skill under that folder, minus `exclude`) into vendor/<source>/. Only permissive licenses are accepted. Change a commit or a skill list here, then run `node scripts/sync.mjs` and commit the result.",
+  "sources": {
+    "hermes": {
+      "repo": "NousResearch/hermes-agent",
+      "commit": "0f602c5f6f18615632535251d62a2db74ce93b69",
+      "license": "MIT",
+      "licenseFile": "LICENSE",
+      "skills": [
+        "skills/software-development/*",
+        "optional-skills/software-development/*",
+        "skills/research/*",
+        "optional-skills/research/*",
+        "skills/productivity/*",
+        "optional-skills/productivity/*",
+        "skills/devops/*",
+        "optional-skills/devops/*",
+        "optional-skills/security/*",
+        "optional-skills/web-development/*",
+        "optional-skills/finance/*",
+        "optional-skills/mcp/*",
+        "skills/web/*"
+      ],
+      "exclude": [
+        "godmode",
+        "sherlock",
+        "web-pentest",
+        "domain-intel",
+        "osint-investigation",
+        "oss-forensics",
+        "1password",
+        "hermes-agent-skill-authoring",
+        "hermes-s6-container-supervision",
+        "inspecting-hermes-desktop-dom",
+        "scrapling",
+        "blocked-page-recovery"
+      ]
+    },
+    "anthropic": {
+      "repo": "anthropics/skills",
+      "commit": "e4bb5d960d87126ff3b3a8af1a104b7db67560ba",
+      "license": "Apache-2.0",
+      "licenseFile": "per-skill:LICENSE.txt",
+      "skills": [
+        "skills/*"
+      ]
+    },
+    "openai": {
+      "repo": "openai/skills",
+      "commit": "49f948faa9258a0c61caceaf225e179651397431",
+      "license": "Apache-2.0",
+      "licenseFile": "per-skill:LICENSE.txt",
+      "skills": [
+        "skills/.curated/*"
+      ]
+    },
+    "superpowers": {
+      "repo": "obra/superpowers",
+      "commit": "22f0b463e7a5e579904dd6211a520321035526f7",
+      "license": "MIT",
+      "licenseFile": "LICENSE",
+      "skills": [
+        "skills/*"
+      ],
+      "exclude": [
+        "using-superpowers",
+        "diagnosing-superpowers"
+      ]
+    },
+    "addyosmani": {
+      "repo": "addyosmani/agent-skills",
+      "commit": "8c99fa36d90068c82d547f7c12a9d67a3e95f4ee",
+      "license": "MIT",
+      "licenseFile": "LICENSE",
+      "skills": [
+        "skills/*"
+      ],
+      "exclude": [
+        "using-agent-skills"
+      ]
+    }
+  }
+}
