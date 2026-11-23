@@ -1,0 +1,21 @@
+name: Validate skills
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      # Re-syncs every pinned source and fails if vendor/ differs from it,
+      # then checks each skill's frontmatter, license and name.
+      - run: node scripts/sync.mjs --check
