@@ -12,7 +12,7 @@ metadata:
 environments:
   - kanban
 license: MIT
-source: https://github.com/NousResearch/hermes-agent/tree/0f602c5f6f18615632535251d62a2db74ce93b69/skills/devops/sdlc-review
+source: https://github.com/NousResearch/hermes-agent/tree/a15b9710395aa1c4858fb6dd9e4c5014c5ced4e9/skills/devops/sdlc-review
 ---
 
 # SDLC Review Skill

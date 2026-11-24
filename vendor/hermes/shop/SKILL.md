@@ -13,7 +13,7 @@ metadata:
     homepage: https://shop.app
     upstream: https://shop.app/SKILL.md
 license: MIT
-source: https://github.com/NousResearch/hermes-agent/tree/0f602c5f6f18615632535251d62a2db74ce93b69/optional-skills/productivity/shop
+source: https://github.com/NousResearch/hermes-agent/tree/a15b9710395aa1c4858fb6dd9e4c5014c5ced4e9/optional-skills/productivity/shop
 ---
 
 # Shop CLI Skill

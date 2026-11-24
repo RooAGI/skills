@@ -6,7 +6,7 @@ author: Hermes Agent + Teknium
 tags: [polymarket, prediction-markets, market-data, trading]
 platforms: [linux, macos, windows]
 license: MIT
-source: https://github.com/NousResearch/hermes-agent/tree/0f602c5f6f18615632535251d62a2db74ce93b69/optional-skills/finance/polymarket
+source: https://github.com/NousResearch/hermes-agent/tree/a15b9710395aa1c4858fb6dd9e4c5014c5ced4e9/optional-skills/finance/polymarket
 ---
 
 # Polymarket — Prediction Market Data

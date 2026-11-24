@@ -1,7 +1,7 @@
 # hermes
 
 These skills are copied from https://github.com/NousResearch/hermes-agent at commit
-`0f602c5f6f18615632535251d62a2db74ce93b69`, under the MIT license.
+`a15b9710395aa1c4858fb6dd9e4c5014c5ced4e9`, under the MIT license.
 The upstream license is in `LICENSE` beside this file.
 
 RooAGI sets `license` and `source` in each SKILL.md frontmatter, renames a skill
