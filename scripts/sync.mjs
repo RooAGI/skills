@@ -1,12 +1,11 @@
 #!/usr/bin/env node
-// Copies the upstream skills listed in sources.json into vendor/<source>/,
-// each pinned to its commit, with its license and an ATTRIBUTION.md, then
-// checks every skill in the repository.
+// Copies downloaded sources listed in sources.json into vendor/<source>/,
+// validates selected submodule skills in place, then checks every skill.
 //
 //   node scripts/sync.mjs            sync vendor/ from sources.json
 //   node scripts/sync.mjs --check    fail if vendor/ differs from sources.json
-//   node scripts/sync.mjs --latest   move every source to its default branch's
-//                                    newest commit, then sync
+//   node scripts/sync.mjs --latest   move downloaded sources to their default
+//                                    branch's newest commit, then sync
 //   node scripts/sync.mjs --validate only check the skills already in the repo
 import { execFileSync } from 'node:child_process'
 import {
@@ -49,7 +48,10 @@ function readManifest() {
     if (!/^[\w.-]+\/[\w.-]+$/.test(source.repo ?? '')) fail(`${name}: repo must be owner/name`)
     if (!/^[0-9a-f]{40}$/.test(source.commit ?? '')) fail(`${name}: commit must be a full 40-character SHA`)
     if (!ALLOWED_LICENSES.has(source.license)) fail(`${name}: license ${source.license} is not allowed`)
-    if (!Array.isArray(source.skills) || !source.skills.length) fail(`${name}: list at least one skill`)
+    if (!Array.isArray(source.skills) || (!source.skills.length && !source.catalogOnly)) fail(`${name}: list at least one skill unless catalogOnly is enabled`)
+    if (source.catalogOnly && (!source.submodule || !source.catalogRoot)) fail(`${name}: catalogOnly requires a submodule and catalogRoot`)
+    if (source.submodule && (!/^[A-Za-z0-9_./-]+$/.test(source.submodule) || source.submodule.startsWith('/') || source.submodule.includes('..')))
+      fail(`${name}: submodule must be a safe repository-relative path`)
   }
   return manifest
 }
@@ -64,7 +66,7 @@ function download(repo, commit, into) {
   return join(into, folder)
 }
 
-/** The newest commit on a repository's default branch (needs `gh`). */
+/** The newest commit on a copied source's default branch (needs `gh`). */
 function latestCommit(repo) {
   return execFileSync('gh', ['api', `repos/${repo}/commits/HEAD`, '--jq', '.sha'], { encoding: 'utf8' }).trim()
 }
@@ -125,7 +127,29 @@ function expandSkills(upstream, source) {
   return out.filter(({ path }) => !excluded.has(basename(path)))
 }
 
-/** Copies the listed skills of every source into `vendorRoot`. */
+/** Verifies the selected submodule paths and their applicable license evidence. */
+function validateSubmoduleSource(name, source) {
+  const root = join(ROOT, source.submodule)
+  if (!existsSync(join(root, ".git"))) fail(`${name}: initialize submodule ${source.submodule} recursively`)
+  const actual = execFileSync("git", ["-C", root, "rev-parse", "HEAD"], { encoding: "utf8" }).trim()
+  if (actual !== source.commit) fail(`${name}: submodule is at ${actual}, expected pinned ${source.commit}`)
+  if (source.noticeFile && !existsSync(join(root, source.noticeFile))) fail(`${name}: upstream ${source.noticeFile} is missing`)
+  const perSkill = source.licenseFile?.startsWith("per-skill:") ? source.licenseFile.slice("per-skill:".length) : undefined
+  const rootLicense = perSkill ? undefined : join(root, source.licenseFile ?? "LICENSE")
+  if (rootLicense && (!existsSync(rootLicense) || !LICENSE_MARKERS[source.license].test(readFileSync(rootLicense, "utf8"))))
+    fail(`${name}: missing verified ${source.license} ${source.licenseFile ?? "LICENSE"}`)
+  for (const { path: skillPath } of expandSkills(root, source)) {
+    const folder = join(root, skillPath)
+    if (!existsSync(join(folder, "SKILL.md"))) fail(`${name}: ${skillPath}/SKILL.md missing at ${source.commit}`)
+    if (perSkill) {
+      const license = join(folder, perSkill)
+      if (!existsSync(license) || !LICENSE_MARKERS[source.license].test(readFileSync(license, "utf8")))
+        fail(`${name}: ${skillPath} missing verified ${source.license} ${perSkill}`)
+    }
+  }
+}
+
+/** Copies the listed downloaded skills into vendorRoot; submodule skills stay upstream. */
 function sync(manifest, vendorRoot) {
   rmSync(vendorRoot, { recursive: true, force: true })
   mkdirSync(vendorRoot, { recursive: true })
@@ -133,6 +157,11 @@ function sync(manifest, vendorRoot) {
   // gets it prefixed with the source name.
   const taken = new Set(ownSkillNames())
   for (const [name, source] of Object.entries(manifest.sources)) {
+    if (source.submodule) {
+      validateSubmoduleSource(name, source)
+      console.log(`${name}: ${expandSkills(join(ROOT, source.submodule), source).length} selected submodule skills`)
+      continue
+    }
     const work = mkdtempSync(join(tmpdir(), `rooagi-skills-${name}-`))
     try {
       const upstream = download(source.repo, source.commit, work)
@@ -230,7 +259,7 @@ function attribution(name, source, copied, perSkill) {
 }
 
 /** Checks every SKILL.md in rooagi/ and vendor/: frontmatter, license and unique names. */
-function validate() {
+function validate(manifest) {
   const names = new Map()
   const problems = []
   const visit = (folder) => {
@@ -259,6 +288,12 @@ function validate() {
   }
   visit(join(ROOT, 'rooagi'))
   visit(join(ROOT, 'vendor'))
+  for (const source of Object.values(manifest.sources ?? {})) {
+    if (source.submodule) {
+      validateSubmoduleSource('submodule source', source)
+      for (const { path: skill } of expandSkills(join(ROOT, source.submodule), source)) visit(join(ROOT, source.submodule, skill))
+    }
+  }
   if (problems.length) fail(`\n  ${problems.join('\n  ')}`)
   console.log(`${names.size} skills valid`)
 }
@@ -276,7 +311,7 @@ function sameTree(a, b) {
 
 const manifest = readManifest()
 if (args.has('--validate')) {
-  validate()
+  validate(manifest)
 } else if (args.has('--check')) {
   const fresh = mkdtempSync(join(tmpdir(), 'rooagi-skills-check-'))
   try {
@@ -284,15 +319,17 @@ if (args.has('--validate')) {
     if (!sameTree(join(fresh, 'vendor'), join(ROOT, 'vendor')))
       fail('vendor/ does not match sources.json: run `node scripts/sync.mjs` and commit the result')
     console.log('vendor/ matches sources.json')
-    validate()
+    validate(manifest)
   } finally {
     rmSync(fresh, { recursive: true, force: true })
   }
 } else {
   if (args.has('--latest')) {
-    for (const source of Object.values(manifest.sources)) source.commit = latestCommit(source.repo)
+    for (const source of Object.values(manifest.sources)) {
+      if (!source.submodule) source.commit = latestCommit(source.repo)
+    }
     writeFileSync(MANIFEST, `${JSON.stringify(manifest, null, 2)}\n`)
   }
   sync(manifest, join(ROOT, 'vendor'))
-  validate()
+  validate(manifest)
 }

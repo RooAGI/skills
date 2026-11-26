@@ -1,0 +1,55 @@
+name: Deploy skills catalog
+on:
+  push:
+    branches: [main]
+    paths:
+      - "site/**"
+      - "upstream/claude-skills"
+      - "upstream/anthropic-skills"
+      - "upstream/aws-agent-toolkit"
+      - "upstream/cloudflare-skills"
+      - ".gitmodules"
+      - "rooagi/**"
+      - "vendor/**"
+      - "sources.json"
+      - ".github/workflows/deploy-site.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: pages
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+      - run: npm ci
+        working-directory: site
+      - run: npm run build
+        working-directory: site
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site/dist
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

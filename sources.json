@@ -1,5 +1,5 @@
 {
-  "$comment": "Upstream skills RooAGI ships. Each source is pinned to a commit; scripts/sync.mjs copies the listed skills (a `folder/*` entry takes every skill under that folder, minus `exclude`) into vendor/<source>/. Only permissive licenses are accepted. Change a commit or a skill list here, then run `node scripts/sync.mjs` and commit the result.",
+  "$comment": "Upstream skills RooAGI ships. Each source is pinned to a commit; scripts/sync.mjs copies downloaded sources into vendor/<source>/ and validates selected paths from pinned submodules in place. catalogRoot bounds catalog discovery: every SKILL.md below that path is cataloged, regardless of explicit skill selections or per-skill license-file presence. Change copied-source pins here; advance a submodule by a reviewed gitlink update.",
   "sources": {
     "hermes": {
       "repo": "NousResearch/hermes-agent",
@@ -38,12 +38,61 @@
     },
     "anthropic": {
       "repo": "anthropics/skills",
+      "submodule": "upstream/anthropic-skills",
       "commit": "e4bb5d960d87126ff3b3a8af1a104b7db67560ba",
       "license": "Apache-2.0",
       "licenseFile": "per-skill:LICENSE.txt",
+      "catalogRoot": "skills",
       "skills": [
-        "skills/*"
+        "skills/academy-guide",
+        "skills/algorithmic-art",
+        "skills/brand-guidelines",
+        "skills/canvas-design",
+        "skills/claude-api",
+        "skills/discernment-nudge",
+        "skills/docx",
+        "skills/frontend-design",
+        "skills/internal-comms",
+        "skills/mcp-builder",
+        "skills/pdf",
+        "skills/pptx",
+        "skills/skill-creator",
+        "skills/slack-gif-creator",
+        "skills/theme-factory",
+        "skills/web-artifacts-builder",
+        "skills/webapp-testing",
+        "skills/xlsx"
       ]
+    },
+    "aws-agent-toolkit": {
+      "repo": "aws/agent-toolkit-for-aws",
+      "submodule": "upstream/aws-agent-toolkit",
+      "commit": "24b0e244c91ab0c64fb3202b568236e1ec6430ad",
+      "license": "Apache-2.0",
+      "licenseFile": "LICENSE",
+      "noticeFile": "NOTICE",
+      "catalogRoot": "skills",
+      "skills": ["skills/*"]
+    },
+    "cloudflare": {
+      "repo": "cloudflare/skills",
+      "submodule": "upstream/cloudflare-skills",
+      "commit": "ff191de7d903788eceaf516a514ae7d3b56b924a",
+      "license": "Apache-2.0",
+      "licenseFile": "LICENSE",
+      "catalogRoot": "skills",
+      "skills": ["skills/*"]
+    },
+    "alireza-claude-skills": {
+      "repo": "alirezarezvani/claude-skills",
+      "catalogName": "Alireza Rezvani / claude-skills",
+      "submodule": "upstream/claude-skills",
+      "commit": "ea7b5ab8da93bbba8880152d9ccb8c9979f12252",
+      "license": "MIT",
+      "licenseFile": "LICENSE",
+      "catalogRoot": ".",
+      "catalogOnly": true,
+      "skills": []
     },
     "openai": {
       "repo": "openai/skills",
