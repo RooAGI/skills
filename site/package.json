@@ -1,0 +1,6 @@
+{
+  "name":"rooagi-skills-atlas","private":true,"version":"1.0.0","type":"module",
+  "scripts":{"dev":"node scripts/build-catalog.mjs && vite","catalog":"node scripts/build-catalog.mjs","build":"node scripts/build-catalog.mjs && tsc --noEmit && vite build","start":"node server/index.mjs"},
+  "dependencies":{"react":"^19.3.0","react-dom":"^19.3.0","membrick":"0.10.2"},
+  "devDependencies":{"@types/node":"^22.15.0","@types/react":"^19.2.18","@types/react-dom":"^19.2.4","@vitejs/plugin-react":"^5.2.0","typescript":"^5.9.3","vite":"^7.3.6"}
+}

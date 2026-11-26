@@ -14,6 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -38,4 +40,4 @@ jobs:
           git commit -m "Update upstream skills"
           git push origin "$branch"
           gh pr create --title "Update upstream skills" \
-            --body "Upstream sources moved. Review what changed in vendor/ before merging: these are instructions agents follow."
+            --body "Copied upstream sources moved. Review the vendor/ changes before merging. Pinned Anthropic, AWS Agent Toolkit, Cloudflare, and Alireza submodules are not advanced by this workflow; review gitlink updates separately."

@@ -1,0 +1,15 @@
+[submodule "upstream/claude-skills"]
+	path = upstream/claude-skills
+	url = https://github.com/alirezarezvani/claude-skills.git
+
+[submodule "upstream/anthropic-skills"]
+	path = upstream/anthropic-skills
+	url = https://github.com/anthropics/skills.git
+
+[submodule "upstream/aws-agent-toolkit"]
+	path = upstream/aws-agent-toolkit
+	url = https://github.com/aws/agent-toolkit-for-aws.git
+
+[submodule "upstream/cloudflare-skills"]
+	path = upstream/cloudflare-skills
+	url = https://github.com/cloudflare/skills.git

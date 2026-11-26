@@ -1,0 +1,16 @@
+[mcp_servers.membrick]
+args = ["--codex-serve"]
+command = "/Users/louis/.local/bin/membrick"
+cwd = "/Users/louis/sources/rooagi-skills"
+enabled = true
+startup_timeout_sec = 120
+
+[mcp_servers.membrick.tools.update_membrick]
+approval_mode = "prompt"
+
+[mcp_servers.flowboard-mcp]
+command = "/Users/louis/sources/roo-agent/desktop/.agentflow-build/flowboard-mcp"
+args = ["--project-root", "/Users/louis/sources/rooagi-skills", "--workspace-root", "/Users/louis/sources/rooagi-skills"]
+cwd = "/Users/louis/sources/rooagi-skills"
+enabled = true
+startup_timeout_sec = 30
